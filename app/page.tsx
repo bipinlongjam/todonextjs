@@ -46,7 +46,7 @@ export default function Home({ }) {
         <div className="sm:w-9/12 lg:w-6/12 w-full px-4 lg:my-10 flex flex-col justify-center items-center">
           <h1 className="lg:text-5xl text-3xl py-8 lg:pt-14 uppercase font-medium text-purple-600">Let's make your day</h1>
           <h1 className="text-4xl py-8 lg:py-0 lg:pt-4 lg:pb-14 text-yellow-500">Todo List</h1>
-          {/*edit todo*/}
+          {/*edit todo */}
 
           {editTodo ? (
             <>
@@ -58,7 +58,7 @@ export default function Home({ }) {
               <button className="bg-slate-800 px-6 py-2 rounded-lg my-7 text-green-400 text-lg uppercase font-semibold">Save</button>
             </>
           ) : (
-            /*add todo*/
+            /*add todo to mongodb*/
             <>
               <input
                 className="w-full lg:w-8/12 bg-black border border-purple-400 py-4 text-xl rounded-lg text-purple-400 outline-none px-3"
@@ -91,6 +91,7 @@ export default function Home({ }) {
                     type="checkbox"
                     className="w-5 h-5 cursor-pointer mt-1"
                     />
+                    {/*get from mongodb */}
                     <span className={`${todo.completed ? "line-through":"list-none"}
                      px-4 w-full text-yellow-500`}>
                       {todo.text}</span>
