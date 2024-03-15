@@ -40,6 +40,29 @@ export default function Home({ }) {
     setTodos([...todos, data]);
     setNewTodoText('')
   }
+
+  const handleEdit =(todo:Todo) =>{
+    setEditTodo(todo)
+  }
+  const handleSave = async()=>{
+    if(!editTodo) return;
+
+    const response = await fetch("http://localhost:3000/api/todo",{
+      method:'PUT',
+      body:JSON.stringify({id:editTodo._id, text:editTodo.text, completed:editTodo.completed}),
+      headers:{
+        "Content-Type":"application/json",
+      }
+    })
+    if(response.status === 200){
+      setTodos(
+        todos.map((todo:Todo) =>
+          todo._id === editTodo._id ? {...todo, text:editTodo.text} : todo
+        )
+      );
+      setEditTodo(null)
+    }
+  }
   return (
     <div className="font-mulish grid lg:place-item-start place-items-center w-full bg-black text-purple-500 min-h-screen">
       <div className="flex lg:flex-row flex-col gap-5 lg:justify-start justify-center lg:items-start items-center w-full mx-auto">
@@ -53,9 +76,11 @@ export default function Home({ }) {
               <input
                 className="w-full lg:w-8/12 bg-black border border-yellow-400 py-4 text-xl rounded-lg text-purple-400 outline-none px-3"
                 type="text"
-
+                value={editTodo.text!}
+                onChange={(e) => setEditTodo({...editTodo, text:e.target.value})}
               />
-              <button className="bg-slate-800 px-6 py-2 rounded-lg my-7 text-green-400 text-lg uppercase font-semibold">Save</button>
+              <button onClick={handleSave}
+               className="bg-slate-800 px-6 py-2 rounded-lg my-7 text-green-400 text-lg uppercase font-semibold">Save</button>
             </>
           ) : (
             /*add todo to mongodb*/
@@ -84,7 +109,7 @@ export default function Home({ }) {
               todos && 
               todos.map((todo: Todo) => (
                 <li key={todo._id}
-                className="bg-slate-900 px-6 py-5 rounded my-3 hover:text-green-400 text-lg w-full"
+                className="bg-slate-900 px-6 py-5 rounded my-3 hover:text-green-400 text-lg w-full flex justify-between items-start"
                 >
                   <div className="flex justify-start items-start w-8/12">
                     <input 
@@ -95,6 +120,10 @@ export default function Home({ }) {
                     <span className={`${todo.completed ? "line-through":"list-none"}
                      px-4 w-full text-yellow-500`}>
                       {todo.text}</span>
+                  </div>
+                  <div className="w-4/12 md:w-3/12">
+                    <button onClick={()=>handleEdit(todo)} className="text-sky-400 uppercase md:text-base text-sm px-3 hover:text-sky-600">Edit</button>
+                    <button className="text-pink-500 uppercase md:text-base text-sm px-3 hover:text-pink-700">Del</button>
                   </div>
                 </li>
               ))}
