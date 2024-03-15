@@ -63,17 +63,34 @@ export default function Home({ }) {
       setEditTodo(null)
     }
   }
- 
-  const deleteTodo = async (id:string) =>{
-    const response= await fetch("http://localhost:3000/api/todo",{
-      method:"DELETE",
-      body:JSON.stringify({id}),
-      headers:{
-        "Content-Type":'application/json',
+
+  const deleteTodo = async (id: string) => {
+    const response = await fetch("http://localhost:3000/api/todo", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+      headers: {
+        "Content-Type": 'application/json',
       }
     })
-    if(response.status === 200){
+    if (response.status === 200) {
       setTodos(todos.filter((todo: Todo) => todo._id !== id))
+    }
+  }
+
+  const toggleTodo = async (id: string, completed: boolean) => {
+    const response = await fetch("http://localhost:3000/api/todo", {
+      method: "PUT",
+      body: JSON.stringify({ id, completed: !completed }),
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+    if (response.status === 200) {
+      setTodos(
+        todos.map((todo: Todo) =>
+          todo._id === id ? { ...todo, completed: !completed } : todo
+        )
+      )
     }
   }
   return (
@@ -128,6 +145,7 @@ export default function Home({ }) {
                       <input
                         type="checkbox"
                         className="w-5 h-5 cursor-pointer mt-1"
+                        onChange={() => toggleTodo(todo._id, todo.completed)}
                       />
                       {/*get from mongodb */}
                       <span className={`${todo.completed ? "line-through" : "list-none"}
