@@ -21,9 +21,9 @@ export default function Home({ }) {
       .then((data) => {
         setTodos(data);
         setLoading(false)
-        console.log("data",data)
+        console.log("data", data)
       })
-  },[])
+  }, [])
 
   const addTodo = async () => {
     if (!newTodoText) return;
@@ -41,26 +41,39 @@ export default function Home({ }) {
     setNewTodoText('')
   }
 
-  const handleEdit =(todo:Todo) =>{
+  const handleEdit = (todo: Todo) => {
     setEditTodo(todo)
   }
-  const handleSave = async()=>{
-    if(!editTodo) return;
+  const handleSave = async () => {
+    if (!editTodo) return;
 
-    const response = await fetch("http://localhost:3000/api/todo",{
-      method:'PUT',
-      body:JSON.stringify({id:editTodo._id, text:editTodo.text, completed:editTodo.completed}),
-      headers:{
-        "Content-Type":"application/json",
+    const response = await fetch("http://localhost:3000/api/todo", {
+      method: 'PUT',
+      body: JSON.stringify({ id: editTodo._id, text: editTodo.text, completed: editTodo.completed }),
+      headers: {
+        "Content-Type": "application/json",
       }
     })
-    if(response.status === 200){
+    if (response.status === 200) {
       setTodos(
-        todos.map((todo:Todo) =>
-          todo._id === editTodo._id ? {...todo, text:editTodo.text} : todo
+        todos.map((todo: Todo) =>
+          todo._id === editTodo._id ? { ...todo, text: editTodo.text } : todo
         )
       );
       setEditTodo(null)
+    }
+  }
+ 
+  const deleteTodo = async (id:string) =>{
+    const response= await fetch("http://localhost:3000/api/todo",{
+      method:"DELETE",
+      body:JSON.stringify({id}),
+      headers:{
+        "Content-Type":'application/json',
+      }
+    })
+    if(response.status === 200){
+      setTodos(todos.filter((todo: Todo) => todo._id !== id))
     }
   }
   return (
@@ -77,10 +90,10 @@ export default function Home({ }) {
                 className="w-full lg:w-8/12 bg-black border border-yellow-400 py-4 text-xl rounded-lg text-purple-400 outline-none px-3"
                 type="text"
                 value={editTodo.text!}
-                onChange={(e) => setEditTodo({...editTodo, text:e.target.value})}
+                onChange={(e) => setEditTodo({ ...editTodo, text: e.target.value })}
               />
               <button onClick={handleSave}
-               className="bg-slate-800 px-6 py-2 rounded-lg my-7 text-green-400 text-lg uppercase font-semibold">Save</button>
+                className="bg-slate-800 px-6 py-2 rounded-lg my-7 text-green-400 text-lg uppercase font-semibold">Save</button>
             </>
           ) : (
             /*add todo to mongodb*/
@@ -105,28 +118,28 @@ export default function Home({ }) {
             </div>
           ) : (
             <>
-              {!isLoading && 
-              todos && 
-              todos.map((todo: Todo) => (
-                <li key={todo._id}
-                className="bg-slate-900 px-6 py-5 rounded my-3 hover:text-green-400 text-lg w-full flex justify-between items-start"
-                >
-                  <div className="flex justify-start items-start w-8/12">
-                    <input 
-                    type="checkbox"
-                    className="w-5 h-5 cursor-pointer mt-1"
-                    />
-                    {/*get from mongodb */}
-                    <span className={`${todo.completed ? "line-through":"list-none"}
+              {!isLoading &&
+                todos &&
+                todos.map((todo: Todo) => (
+                  <li key={todo._id}
+                    className="bg-slate-900 px-6 py-5 rounded my-3 hover:text-green-400 text-lg w-full flex justify-between items-start"
+                  >
+                    <div className="flex justify-start items-start w-8/12">
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 cursor-pointer mt-1"
+                      />
+                      {/*get from mongodb */}
+                      <span className={`${todo.completed ? "line-through" : "list-none"}
                      px-4 w-full text-yellow-500`}>
-                      {todo.text}</span>
-                  </div>
-                  <div className="w-4/12 md:w-3/12">
-                    <button onClick={()=>handleEdit(todo)} className="text-sky-400 uppercase md:text-base text-sm px-3 hover:text-sky-600">Edit</button>
-                    <button className="text-pink-500 uppercase md:text-base text-sm px-3 hover:text-pink-700">Del</button>
-                  </div>
-                </li>
-              ))}
+                        {todo.text}</span>
+                    </div>
+                    <div className="w-4/12 md:w-3/12">
+                      <button onClick={() => handleEdit(todo)} className="text-sky-400 uppercase md:text-base text-sm px-3 hover:text-sky-600">Edit</button>
+                      <button onClick={() => deleteTodo(todo._id)} className="text-pink-500 uppercase md:text-base text-sm px-3 hover:text-pink-700">Del</button>
+                    </div>
+                  </li>
+                ))}
             </>
           )}
         </ul>
